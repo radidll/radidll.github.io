@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolyo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            background: #000;
+            color: #fff;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #000;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .view-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+
+        .intro-section {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .intro-box {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 800px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .intro-text {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .tech-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .projects-section {
+            padding: 60px 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .project-card {
+            margin-bottom: 80px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .project-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .project-description {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .project-description h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .project-description p {
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .contact-section {
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .contact-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .intro-box {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .project-image {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="view-counter">
+        👁️ Görüntülenme: <span id="viewCount">500</span>
+    </div>
+
+    <div class="intro-section">
+        <div class="intro-box">
+            <h1>Merhaba, Ben [Adınız] 👋</h1>
+            <div class="intro-text">
+                <p>Yazılım geliştirme tutkusuyla projeler üretiyorum. Web ve mobil uygulama geliştirme alanında deneyim sahibiyim ve sürekli olarak yeni teknolojileri öğrenmeye devam ediyorum.</p>
+                <br>
+                <p>Şu anda <strong>mobil uygulama geliştirme</strong> üzerine yoğunlaşıyorum ve yakın zamanda yayınlayacağım heyecan verici bir uygulama üzerinde çalışıyorum. Ayrıca Node.js kullanarak Discord için moderasyon, eğlence ve güvenlik botları geliştiriyorum.</p>
+            </div>
+
+            <div class="tech-stack">
+                <div class="tech-tag">Python</div>
+                <div class="tech-tag">JavaScript</div>
+                <div class="tech-tag">TypeScript</div>
+                <div class="tech-tag">HTML & CSS</div>
+                <div class="tech-tag">C#</div>
+                <div class="tech-tag">React / Next.js</div>
+                <div class="tech-tag">React Native</div>
+                <div class="tech-tag">Tailwind CSS</div>
+                <div class="tech-tag">Node.js</div>
+                <div class="tech-tag">Firebase</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="projects-section container">
+        <h2 class="section-title">Projelerim</h2>
+
+        <div class="project-card">
+            <div class="project-image">Proje Görseli 1</div>
+            <div class="project-description">
+                <h3>Proje Adı 1</h3>
+                <p>Bu projenin açıklaması buraya gelecek. Projenin ne yaptığını, hangi teknolojileri kullandığını ve hangi problemleri çözdüğünü açıklayabilirsiniz.</p>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-image">Proje Görseli 2</div>
+            <div class="project-description">
+                <h3>Proje Adı 2</h3>
+                <p>İkinci projenizin detaylı açıklaması. Projenin özelliklerini ve kullanılan teknolojileri buraya ekleyebilirsiniz.</p>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-image">Proje Görseli 3</div>
+            <div class="project-description">
+                <h3>Proje Adı 3</h3>
+                <p>Üçüncü projenizin açıklaması. Her projede farklı teknolojiler ve yaklaşımlar kullandığınızı gösterebilirsiniz.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="contact-section">
+        <h2 class="section-title">İletişim</h2>
+        <div class="contact-links">
+            <a href="https://github.com/kullaniciadi" target="_blank" class="contact-link">
+                📱 GitHub: @kullaniciadi
+            </a>
+            <a href="mailto:email@example.com" class="contact-link">
+                ✉️ email@example.com
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // View Counter
+        let viewCount = parseInt(localStorage.getItem('portfolioViews')) || 500;
+        viewCount++;
+        localStorage.setItem('portfolioViews', viewCount);
+        document.getElementById('viewCount').textContent = viewCount;
+
+        // Animated Background
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const waves = [];
+        const colors = [
+            'rgba(102, 126, 234, 0.3)',
+            'rgba(118, 75, 162, 0.3)',
+            'rgba(147, 51, 234, 0.3)',
+            'rgba(79, 70, 229, 0.3)'
+        ];
+
+        class Wave {
+            constructor(y, speed, amplitude, frequency, color) {
+                this.y = y;
+                this.speed = speed;
+                this.amplitude = amplitude;
+                this.frequency = frequency;
+                this.color = color;
+                this.offset = Math.random() * Math.PI * 2;
+            }
+
+            draw(time) {
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height);
+
+                for (let x = 0; x < canvas.width; x++) {
+                    const y = this.y + Math.sin((x * this.frequency) + (time * this.speed) + this.offset) * this.amplitude;
+                    ctx.lineTo(x, y);
+                }
+
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.lineTo(0, canvas.height);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 4; i++) {
+            waves.push(new Wave(
+                canvas.height * (0.3 + i * 0.15),
+                0.0003 + i * 0.0001,
+                50 + i * 20,
+                0.01 - i * 0.002,
+                colors[i]
+            ));
+        }
+
+        function animate() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const time = Date.now();
+            waves.forEach(wave => wave.draw(time));
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Scroll Animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.project-card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
